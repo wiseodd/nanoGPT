@@ -1,4 +1,7 @@
 import time
+from functools import partial
+import torch
+from minlora import LoRAParametrization
 
 out_dir = 'out-shakespeare'
 eval_interval = 5
@@ -23,3 +26,18 @@ max_iters = 20
 # finetune at constant LR
 learning_rate = 3e-5
 decay_lr = False
+
+# LoRA
+use_lora = True
+learning_rate = 1e-3 # use a higher LR for LoRA
+lora_dropout_p = 0.0
+rank=1
+lora_alpha = 64
+lora_config = {
+    # torch.nn.Embedding: {
+    #     "weight": partial(LoRAParametrization.from_embedding, rank=rank, lora_alpha=lora_alpha),
+    # },
+    torch.nn.Linear: {
+        "weight": partial(LoRAParametrization.from_linear, rank=rank, lora_alpha=lora_alpha),
+    },
+}
